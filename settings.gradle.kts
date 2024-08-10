@@ -23,3 +23,4 @@ rootProject.name = "YmGalgame"
 include(":app")
 
 
+include(":mylibrary")
