@@ -1,12 +1,20 @@
 package com.nullable.ymgalgame.network
 
-import com.nullable.ymgalgame.ui.feature.foryou.model.Topic
+import arrow.core.Either
 import kotlinx.coroutines.flow.Flow
 
-sealed class Result {
-    data class TopicsResponse(
-        val isSuccess: Boolean = false,
-        val data: Flow<List<Topic>>
-    ): Result()
+typealias NetworkResult<T> = Either<NetworkError,Flow<T>>
 
+typealias ResponseResult<T> = Either<SerializationError,T>
+
+sealed interface Error{
+    val message: String
 }
+
+data class SerializationError(
+    override val message: String
+):Error
+
+data class NetworkError(
+    override val message: String,
+): Error
