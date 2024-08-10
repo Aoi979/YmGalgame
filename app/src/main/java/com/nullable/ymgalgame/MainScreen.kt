@@ -18,7 +18,9 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.rememberBottomAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,87 +28,54 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.nullable.ymgalgame.ui.feature.archives.ArchiveScreen
 import com.nullable.ymgalgame.ui.feature.foryou.ForYouScreen
+import com.nullable.ymgalgame.ui.feature.foryou.ForYouState
+import com.nullable.ymgalgame.ui.feature.foryou.ForYouViewModel
+import com.nullable.ymgalgame.ui.feature.foryou.repository.ForYouRepositoryImpl
 import com.nullable.ymgalgame.ui.feature.picset.PicsetScreen
 import com.nullable.ymgalgame.ui.theme.Duration_Long2
+import com.nullable.ymgalgame.ui.theme.Duration_Medium2
+import com.nullable.ymgalgame.ui.theme.Duration_Medium4
 import com.nullable.ymgalgame.ui.theme.FadingAlpha
 import com.nullable.ymgalgame.ui.theme.Scaling
 
 
 @Composable
 fun MainScreen() {
+    val forYouViewModel: ForYouViewModel = hiltViewModel()
     val navController = rememberNavController()
     MainContent(
         navController
     ) {
-        composable(
-            route = "For You",
-            enterTransition = {
-                scaleIn(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    initialScale = Scaling,
-                ) + fadeIn(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    initialAlpha = FadingAlpha,
-                )
-            },
-            exitTransition = {
-                scaleOut(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    targetScale = Scaling,
-                ) + fadeOut(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    targetAlpha = FadingAlpha,
-                )
-            },
-        ) {
-            ForYouScreen()
-        }
-        
+
+
         composable(
             route = "Archives",
             enterTransition = {
-                scaleIn(
+                fadeIn(
                     animationSpec = tween(
-                        durationMillis = Duration_Long2
+                        durationMillis = Duration_Medium2
                     ),
-                    initialScale = Scaling,
-                ) + fadeIn(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    initialAlpha = FadingAlpha,
                 )
             },
             exitTransition = {
-                scaleOut(
+                fadeOut(
                     animationSpec = tween(
-                        durationMillis = Duration_Long2
+                        durationMillis = Duration_Medium2
                     ),
-                    targetScale = Scaling,
-                ) + fadeOut(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    targetAlpha = FadingAlpha,
                 )
             },
-        ){
+        ) {
             ArchiveScreen()
         }
 
@@ -114,34 +83,49 @@ fun MainScreen() {
         composable(
             route = "Picset",
             enterTransition = {
-                scaleIn(
+                fadeIn(
                     animationSpec = tween(
-                        durationMillis = Duration_Long2
+                        durationMillis = Duration_Medium2
                     ),
-                    initialScale = Scaling,
-                ) + fadeIn(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    initialAlpha = FadingAlpha,
                 )
             },
             exitTransition = {
-                scaleOut(
+                fadeOut(
                     animationSpec = tween(
-                        durationMillis = Duration_Long2
+                        durationMillis = Duration_Medium2
                     ),
-                    targetScale = Scaling,
-                ) + fadeOut(
-                    animationSpec = tween(
-                        durationMillis = Duration_Long2
-                    ),
-                    targetAlpha = FadingAlpha,
                 )
             },
-        ){
+        ) {
             PicsetScreen()
-        }}
+        }
+//        navigation(
+//            route = "For_You",
+//            startDestination ="For You"
+//        ){
+        composable(
+            route = "For You",
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        durationMillis = Duration_Medium2
+                    ),
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        durationMillis = Duration_Medium2
+                    ),
+                )
+            },
+        ) {
+            ForYouScreen(navController, forYouViewModel)
+        }
+//        }
+    }
+
+
 }
 
 
@@ -155,6 +139,7 @@ fun MainContent(
     startDestination: String = "For You",
     navGraphBuilder: NavGraphBuilder.() -> Unit,
 ) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var selectedItem by remember { mutableIntStateOf(0) }
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -163,30 +148,21 @@ fun MainContent(
                     icon = { Icon(iconItems[index], contentDescription = item) },
                     label = { Text(item) },
                     selected = selectedItem == index,
-                    onClick = { selectedItem = index
+                    onClick = {
+                        selectedItem = index
                         navController.navigate(item)
                     }
                 )
             }
         }
     ) {
-        Scaffold(
-            topBar = {
-                MediumTopAppBar(
-                    title = { Text("YmGalagme") }
-                )
-            }
-        ) { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
                 NavHost(
                     navController = navController,
                     startDestination = startDestination,
                     builder = navGraphBuilder
                 )
-            }
 
 
-        }
 
 
     }

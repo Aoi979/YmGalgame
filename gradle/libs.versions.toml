@@ -13,11 +13,11 @@ activityCompose = "1.9.1"
 composeBom = "2024.06.00"
 appcompat = "1.7.0"
 material = "1.12.0"
-androidxNavigation = "2.8.0-beta06"
+androidxNavigation = "2.8.0-beta07"
 hilt = "2.51.1"
 hiltExt = "1.2.0"
 androidxHiltNavigationCompose = "1.2.0"
-ksp = "2.0.0-1.0.22"
+ksp = "2.0.10-1.0.24"
 coil = "2.7.0"
 kotlinxCoroutinesCore = "1.9.0-RC"
 foundationLayoutAndroid = "1.6.8"
@@ -63,7 +63,6 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroid" }
 androidx-material3-adaptive-navigation-suite-android = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite-android", version.ref = "material3AdaptiveNavigationSuiteAndroid" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 [plugins]
@@ -72,4 +71,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
