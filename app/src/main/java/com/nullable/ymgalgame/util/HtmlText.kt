@@ -1,98 +1,149 @@
 package com.nullable.ymgalgame.util
 
 import android.content.Context
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.nullable.ymgalgame.designsystem.Image
+import com.nullable.ymgalgame.ui.theme.Duration_Medium2
+import com.nullable.ymgalgame.ui.theme.Duration_Medium3
+import com.nullable.ymgalgame.ui.theme.Duration_Medium4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.jsoup.nodes.TextNode
 
-fun preloadImage(context: Context, imageUrl: String, onImageLoaded: (IntSize) -> Unit) {
+
+@Composable
+fun DynamicText(annotatedString: AnnotatedString, imageList: List<String>) {
+    var visibility by remember { mutableStateOf(false) }
+    val map = remember { mutableStateMapOf<String, InlineTextContent>() }
+    val maxScreenWidthSp = maxScreenWidthSp()
+    val content = LocalContext.current
+    var targetIndex by remember { mutableIntStateOf(0) }
+    LaunchedEffect(map) {
+        imageList.forEachIndexed { index, image ->
+            if (index >= targetIndex) {
+                preloadImage(content, image, { imageSize ->
+                    val ratio = imageSize.width.toFloat() / imageSize.height.toFloat()
+                    val placeholderHeightSp = (maxScreenWidthSp.value / ratio).sp
+                    val placeholder = Placeholder(
+                        width = maxScreenWidthSp,
+                        height = placeholderHeightSp,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                    )
+                    map[image] = InlineTextContent(
+                        placeholder = placeholder
+                    ) {
+                        Image(image, Modifier.fillMaxWidth())
+                    }
+                }, onError = {
+                    map[image] = InlineTextContent(
+                        placeholder = Placeholder(
+                            width = maxScreenWidthSp,
+                            height = maxScreenWidthSp * 0.25,
+                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                        )
+                    ) {
+                        Image(image, Modifier.fillMaxWidth())
+                    }
+                })
+                if (targetIndex == imageList.size - 1) {
+                    visibility = true
+                }
+                targetIndex++
+            }
+        }
+    }
+
+
+    AnimatedVisibility(
+        visible = visibility,
+        enter =
+        fadeIn(animationSpec = tween(durationMillis = Duration_Medium4),
+            initialAlpha = .0f),
+        exit = fadeOut(
+            animationSpec = tween(durationMillis = Duration_Medium2)
+        ) + shrinkOut(
+            animationSpec = tween(durationMillis = Duration_Medium2)
+        )
+    ) {
+        SelectionContainer {
+            Text(
+                fontSize = 14.sp,
+                modifier = Modifier,
+                fontFamily = FontFamily.Serif,
+                text = annotatedString,
+                inlineContent = map
+            )
+        }
+
+    }
+
+
+}
+
+fun preloadImage(
+    context: Context,
+    imageUrl: String,
+    onImageLoaded: (IntSize) -> Unit,
+    onError: () -> Unit
+) {
     val imageRequest = ImageRequest.Builder(context)
         .data(imageUrl)
         .allowHardware(false)
         .listener(onSuccess = { _, result ->
             val size = IntSize(result.drawable.intrinsicWidth, result.drawable.intrinsicHeight)
             onImageLoaded(size)
-        })
+        },
+            onError = { _, _ ->
+                onError()
+            })
         .build()
-
     CoroutineScope(Dispatchers.IO).launch {
         val imageLoader = ImageLoader(context)
         imageLoader.execute(imageRequest)
     }
 }
 
-
-@Composable
-fun DynamicText(annotatedString: AnnotatedString, imageList: List<String>) {
-    val map = remember { mutableStateMapOf<String, InlineTextContent>() }
-    val maxScreenWidthSp = maxScreenWidthSp()
-    val content = LocalContext.current
-
-    LaunchedEffect(imageList) {
-        imageList.forEach { image ->
-            preloadImage(content, image) { imageSize ->
-                val ratio = imageSize.width.toFloat() / imageSize.height.toFloat()
-                val placeholderHeightSp = (maxScreenWidthSp.value / ratio).sp
-
-                val placeholder = Placeholder(
-                    width = maxScreenWidthSp,
-                    height = placeholderHeightSp,
-                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                )
-
-                map[image] = InlineTextContent(
-                    placeholder = placeholder
-                ) {
-                    AsyncImage(
-                        model = image,
-                        contentDescription = "Image",
-                        modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-        }
-    }
-
-    Text(
-        text = annotatedString,
-        inlineContent = map
-    )
-}
 
 @Composable
 fun maxScreenWidthSp(): TextUnit {
@@ -114,57 +165,6 @@ fun htmlToAnnotatedString(html: String): AnnotatedString {
     }
 }
 
-private fun AnnotatedString.Builder.appendElement(element: Element) {
-    for (node in element.childNodes()) {
-        when (node) {
-            is TextNode -> append(node.text())
-            is Element -> {
-                when (node.tagName()) {
-                    "b", "strong" -> withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        appendElement(node)
-                    }
-
-                    "i", "em" -> withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                        appendElement(node)
-                    }
-
-                    "u" -> withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
-                        appendElement(node)
-                    }
-
-                    "a" -> {
-                        val url = node.attr("href")
-                        pushStringAnnotation(tag = "URL", annotation = url)
-                        withStyle(
-                            SpanStyle(
-                                color = androidx.compose.ui.graphics.Color.Blue,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        ) {
-                            appendElement(node)
-                        }
-                        pop()
-                    }
-
-                    "p" -> {
-                        appendElement(node)
-                        append("\n\n")
-                    }
-
-                    "br" -> append("\n")
-                    "img" -> {
-                        append("\n")
-                        appendInlineContent(node.absUrl("src"))
-
-                    }
-
-                    else -> appendElement(node)
-                }
-            }
-        }
-    }
-}
-
 
 fun extractImageLinksFromHtml(html: String): List<String> {
     val imgLinks = mutableListOf<String>()
@@ -181,13 +181,14 @@ fun extractImageLinksFromHtml(html: String): List<String> {
 
 @Preview
 @Composable
-fun Previewtext() {
+fun PreviewText() {
+    val scrollState = rememberScrollState()
     val html = "<article topicid=\"610953488221863936\">\n" +
             "                    \n" +
             " \n" +
             " \n" +
             "  <p>这画师画风很幼，主页一眼看过去不是萝莉就是大胸萝莉，在国内虽然没什么名气，但推特粉丝还是不少的。这次整的这同人游戏看起来有点东西。</p>\n" +
-            "  <p><img src=\"https://store.ymgal.games/topic/content/c9/c94d650c07694c7695cf8b7c9b70f089.jpg\">画师P站：</p>\n" +
+            "  <p><img src=\"http2s://store.ymgal.games/topic/content/c9/c94d650c07694c7695cf8b7c9b70f089.jpg\">画师P站：</p>\n" +
             "  <p><img src=\"https://store.ymgal.games/topic/content/34/34ca0c2e07474973a082651d790b7400.jpg\"></p>\n" +
             "  <p><br></p>\n" +
             "  <p>之所以说有点东西呢，是因为我看了下游戏简介，真有活的，不愧是同人作呀，确实有那商业作没有的创意。</p>\n" +
@@ -206,9 +207,14 @@ fun Previewtext() {
             " \n" +
             "\n" +
             "                </article>"
+
     val annotatedString = htmlToAnnotatedString(html)
-
     val a = extractImageLinksFromHtml(html)
-    DynamicText(annotatedString, a)
-
+    Column(
+        Modifier
+            .padding(8.dp)
+            .verticalScroll(scrollState)
+    ) {
+        DynamicText(annotatedString, a)
+    }
 }

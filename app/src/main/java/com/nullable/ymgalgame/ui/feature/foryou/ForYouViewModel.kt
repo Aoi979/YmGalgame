@@ -1,14 +1,12 @@
 package com.nullable.ymgalgame.ui.feature.foryou
 
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nullable.ymgalgame.ui.feature.foryou.model.DataCategory
 import com.nullable.ymgalgame.ui.feature.foryou.model.Topic
-import com.nullable.ymgalgame.ui.feature.foryou.model.TopicCategory
 import com.nullable.ymgalgame.ui.feature.foryou.repository.ForYouRepository
-import com.nullable.ymgalgame.ui.feature.foryou.repository.ForYouRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -16,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.future.future
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,6 +27,10 @@ class ForYouViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+
+
+
+
             val a = async { collectTopics(1, DataCategory.NEWS) }
             val b = async { collectTopics(1, DataCategory.COLUMN) }
             joinAll(a, b)
@@ -41,6 +42,10 @@ class ForYouViewModel @Inject constructor(
         }
     }
 
+    var currentPageL = 1
+
+    var currentPageR = 1
+
     val sources = listOf("New", "Impressions")
 
     val lazyVerticalGridStateL = LazyGridState()
@@ -51,7 +56,7 @@ class ForYouViewModel @Inject constructor(
 
     val state: StateFlow<ForYouState> = _state.asStateFlow()
 
-    suspend fun collectTopics(page: Int, dataCategory: DataCategory) {
+     suspend fun collectTopics(page: Int  , dataCategory: DataCategory) {
         withContext(Dispatchers.IO) {
             getTopics(page, dataCategory).fold(
                 ifLeft = { updateMessage("Check your network") },
@@ -65,6 +70,16 @@ class ForYouViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+     suspend fun updateTopics(dataCategory: DataCategory){
+            if (dataCategory == DataCategory.NEWS){
+                currentPageL++
+                collectTopics(currentPageL, dataCategory)
+            }else{
+                currentPageR++
+                collectTopics(currentPageR,dataCategory)
+            }
     }
 
     private suspend fun updateMessage(message: String) {

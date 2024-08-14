@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.0-alpha03"
+agp = "8.7.0-alpha06"
 arrowCore = "1.2.4"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"

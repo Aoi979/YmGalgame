@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import arrow.core.Either
+import arrow.core.raise.Raise
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.statement.HttpResponse
@@ -19,8 +20,6 @@ object NetworkMonitor {
 
     val ktorClient = HttpClient(CIO)
 
-
-
     fun isOnline(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -30,6 +29,8 @@ object NetworkMonitor {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
     }
+
+//    fun Raise<LoginFailed>.login(username: String, password: String):
 
 }
 

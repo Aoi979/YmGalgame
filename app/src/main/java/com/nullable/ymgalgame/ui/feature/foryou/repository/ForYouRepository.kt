@@ -70,7 +70,7 @@ class ForYouRepositoryImpl : ForYouRepository {
         )
 }
 
-inline fun <reified R, reified P : Any> P.ifEx(
+inline fun <R,P> P.ifEx(
     judgment: P.() -> Boolean,
     ifTrue: P.() -> R,
     ifFalse: P.() -> R
