@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -146,13 +148,13 @@ fun preloadImage(
 
 
 @Composable
-fun maxScreenWidthSp(): TextUnit {
+fun maxScreenWidthSp(padding: Int = 16): TextUnit {
 
     val configuration = LocalConfiguration.current
 
-    val screenWidthDp = configuration.screenWidthDp.dp
+    val screenWidthDpRetainsMargins = (configuration.screenWidthDp-2*padding).dp
 
-    return with(LocalDensity.current) { screenWidthDp.toSp() }
+    return with(LocalDensity.current) { screenWidthDpRetainsMargins.toSp() }
 }
 
 @Composable

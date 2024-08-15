@@ -1,6 +1,5 @@
 package com.nullable.ymgalgame.ui.feature.foryou.detail
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,29 +9,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,22 +38,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.nullable.ymgalgame.designsystem.Image
 import com.nullable.ymgalgame.ui.theme.Avatar_48
-import com.nullable.ymgalgame.ui.theme.Sizing_40
-import com.nullable.ymgalgame.ui.theme.Sizing_56
 import com.nullable.ymgalgame.ui.theme.Spacing_16
-import com.nullable.ymgalgame.ui.theme.Spacing_4
 import com.nullable.ymgalgame.ui.theme.Spacing_8
 import com.nullable.ymgalgame.util.DynamicText
 import com.nullable.ymgalgame.util.extractImageLinksFromHtml
 import com.nullable.ymgalgame.util.htmlToAnnotatedString
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -199,13 +186,12 @@ fun ProfileBar() {
         Image("https://store.ymgal.games/avatar/c7/c787fd97e4784b059e0cd8389c0de5d6.webp",
             shimmerSize = Avatar_48,
             modifier = Modifier.size(Avatar_48))
-        SelectionContainer {
             Text(
                 text = "义无反顾",
                 modifier = Modifier.clickable {
+//                    navController.navigate("Archives")
                 }
             )
-        }
         Spacer(Modifier.weight(1f))
         Icon(
             imageVector = Icons.Rounded.DateRange,

@@ -1,12 +1,11 @@
 package com.nullable.ymgalgame.ui.feature.foryou
 
-import android.transition.Fade
-import android.util.Log
-import android.view.MotionEvent
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +16,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -41,19 +44,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.nullable.ymgalgame.designsystem.YmCard
 import com.nullable.ymgalgame.ui.feature.foryou.model.DataCategory
-import com.nullable.ymgalgame.ui.theme.Duration_Medium2
 import com.nullable.ymgalgame.ui.theme.Spacing_8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.math.log
-import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -91,6 +90,18 @@ fun ForYouScreen(
     Scaffold(
         topBar = {
             MediumTopAppBar(
+                actions = {
+                    IconButton(onClick = {
+                        if (columns == 1) {
+                            columns = 2
+                        } else {
+                            columns = 1
+                        }
+
+                    }) {
+                        Icon(Icons.Rounded.MoreVert, "more")
+                    }
+                },
                 title = { Text("YmGalagme") },
                 scrollBehavior = scrollBehavior
             )
@@ -143,21 +154,38 @@ fun ForYouScreen(
 
                                 ) {
                                 items(state.newsTopics) {
-                                    YmCard(
-                                        modifier = Modifier
-                                            .padding(Spacing_8)
-                                            .animateItem(),
-                                        imageURL = it.mainImg,
-                                        headline = it.title,
-                                        subhead = it.createAt
-                                    )
+                                    AnimatedContent(
+                                        it, label = "topicCard",
+                                        transitionSpec = {
+                                            (fadeIn(
+                                                animationSpec = tween(
+                                                    220,
+                                                    delayMillis = 90
+                                                )
+                                            ) + expandVertically()).togetherWith(
+                                                fadeOut(
+                                                    animationSpec = tween(90)
+                                                )
+                                            )
+
+
+                                        },
+                                        modifier = Modifier.animateItem()
+                                    ) {
+                                        YmCard(
+                                            modifier = Modifier
+                                                .padding(Spacing_8),
+                                            imageURL = it.mainImg,
+                                            headline = it.title,
+                                            subhead = it.createAt
+                                        )
+
+                                    }
+
                                 }
                             }
                         }
-
-
                     } else {
-
                         LazyVerticalGrid(
                             state = lazyVerticalGridStateR,
                             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -190,13 +218,8 @@ fun ForYouScreen(
 
 }
 
-fun calculateDistance(event: MotionEvent): Float {
-    val dx = event.getX(0) - event.getX(1)
-    val dy = event.getY(0) - event.getY(1)
-    return sqrt(dx * dx + dy * dy)
-}
-
 @Preview
 @Composable
 fun Preview() {
+
 }

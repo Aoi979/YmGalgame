@@ -29,7 +29,6 @@ import coil.request.ImageRequest
 import com.nullable.ymgalgame.ui.theme.Corner_12
 import com.nullable.ymgalgame.ui.theme.Duration_Short4
 import com.nullable.ymgalgame.ui.theme.Sizing_120
-import com.nullable.ymgalgame.ui.theme.Sizing_56
 import com.nullable.ymgalgame.ui.theme.Spacing_16
 import com.nullable.ymgalgame.ui.theme.Spacing_4
 
@@ -59,7 +58,7 @@ fun YmCard(
             contentScale = ContentScale.Crop,
             loading = {
                 Box(modifier = Modifier
-                    .size(Sizing_120)
+                    .size(Sizing_120*2)
                     .shimmer())
             },
             error = {

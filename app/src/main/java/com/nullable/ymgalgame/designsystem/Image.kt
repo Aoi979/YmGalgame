@@ -1,9 +1,6 @@
 package com.nullable.ymgalgame.designsystem
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,7 +15,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +29,7 @@ import com.nullable.ymgalgame.ui.theme.Duration_Short4
 fun Image(
     imageUrl: String,
     modifier: Modifier,
-    shimmerSize: Dp = LocalConfiguration.current.screenWidthDp.dp
+    shimmerSize: Dp = LocalConfiguration.current.screenWidthDp.dp,
 ) {
     var retryHash by remember { mutableIntStateOf(0) }
 
@@ -47,6 +43,7 @@ fun Image(
         modifier = modifier
             .clip(RoundedCornerShape(Corner_12)),
         contentScale = ContentScale.Crop,
+
         loading = {
             Box(
                 modifier = Modifier
